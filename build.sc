@@ -9,6 +9,12 @@ import com.typesafe.tools.mima.lib.MiMaLib
 import com.typesafe.tools.mima.core._
 
 val scalaVersions = Seq("2.11.12", "2.12.8", "2.13.0")
+val playJsonVersions = Seq(
+  ("2.11.12", "2.5.19"),
+  ("2.11.12", "2.7.4"),
+  ("2.12.8", "2.7.4"),
+  ("2.13.0", "2.7.4")
+)
 
 trait CommonModule extends ScalaModule {
 
@@ -226,21 +232,18 @@ object weejson extends Module{
     }
   }
 
-  object play extends Cross[PlayModule](scalaVersions:_*)
-  class PlayModule(val crossScalaVersion: String) extends CommonPublishModule {
+  object play extends Cross[PlayModule](playJsonVersions:_*)
+  class PlayModule(val crossScalaVersion: String, val crossPlayVersion: String) extends CommonPublishModule {
 
-    def playVersion = T {
-      if (isScalaOld()) "2.5.19" else "2.7.4"
-    }
     def artifactName = T{
-      val name = "weejson-play" + playVersion().split('.').take(2).mkString // e.g. "25", "27"
+      val name = "weejson-play" + crossPlayVersion.split('.').take(2).mkString // e.g. "25", "27"
       shade(name)
     }
     def platformSegment = "jvm"
     def moduleDeps = Seq(weepickle.jvm())
     def ivyDeps = T{
       Agg(
-        ivy"com.typesafe.play::play-json:${playVersion()}"
+        ivy"com.typesafe.play::play-json:${crossPlayVersion}"
       )
     }
 
