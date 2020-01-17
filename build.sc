@@ -8,8 +8,7 @@ import mill.scalajslib._
 import com.typesafe.tools.mima.lib.MiMaLib
 import com.typesafe.tools.mima.core._
 
-val scalaVersions = Seq("2.11.12", "2.12.8", "2.13.0")
-val playJsonVersions = Seq(
+val scalaPlayVersions = Seq(
   ("2.11.12", "2.5.19"),
   ("2.11.12", "2.7.4"),
   ("2.12.8", "2.7.4"),
@@ -146,6 +145,7 @@ object implicits extends Module {
     }
 
   }
+
   object jvm extends Cross[JvmModule](scalaVersions: _*)
   class JvmModule(val crossScalaVersion: String) extends ImplicitsModule with CommonJvmModule{
     def moduleDeps = Seq(core.jvm())
@@ -188,8 +188,8 @@ object weejson extends Module{
     object test extends Tests with ScalaTestModule
   }
 
-  object argonaut extends Cross[ArgonautModule](scalaVersions: _*)
-  class ArgonautModule(val crossScalaVersion: String) extends CommonPublishModule{
+  object argonaut extends Cross[ArgonautModule](scalaPlayVersions: _*)
+  class ArgonautModule(val crossScalaVersion: String, val crossPlayVersion: String) extends CommonPublishModule{
     def artifactName = shade("weejson-argonaut")
     def platformSegment = "jvm"
     def moduleDeps = Seq(weejson.jvm())
@@ -222,8 +222,8 @@ object weejson extends Module{
     )
   }
 
-  object circe extends Cross[CirceModule](scalaVersions: _*)
-  class CirceModule(val crossScalaVersion: String) extends CommonPublishModule{
+  object circe extends Cross[CirceModule](scalaPlayVersions: _*)
+  class CirceModule(val crossScalaVersion: String, val crossPlayVersion: String) extends CommonPublishModule{
     def artifactName = shade("weejson-circe")
     def platformSegment = "jvm"
     def moduleDeps = Seq(weejson.jvm())
@@ -232,7 +232,7 @@ object weejson extends Module{
     }
   }
 
-  object play extends Cross[PlayModule](playJsonVersions:_*)
+  object play extends Cross[PlayModule](scalaPlayVersions:_*)
   class PlayModule(val crossScalaVersion: String, val crossPlayVersion: String) extends CommonPublishModule {
 
     def artifactName = T{
@@ -286,7 +286,6 @@ trait weepickleModule extends CommonPublishModule{
   )
 }
 
-
 object weepickle extends Module{
   object jvm extends Cross[JvmModule](scalaVersions: _*)
   class JvmModule(val crossScalaVersion: String) extends weepickleModule with CommonJvmModule{
@@ -308,6 +307,7 @@ object weepickle extends Module{
 
 trait BenchModule extends CommonModule {
   def scalaVersion = "2.12.8"
+  def scalaPlayVersion = ("2.12.8", "2.7.4")
   def millSourcePath = build.millSourcePath / "bench"
   def ivyDeps = Agg(
     ivy"io.circe::circe-core::0.12.1",
