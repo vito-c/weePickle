@@ -235,24 +235,9 @@ object weejson extends Module{
 
   object play extends Cross[PlayModule](scalaPlayVersions:_*)
   class PlayModule(val crossScalaVersion: String, val crossPlayVersion: String) extends CommonPublishModule {
-    // def crossPlayVersion = T {
-    //   if (isScalaOld()) "2.5.19" else "2.7.4"
-    // }
 
     override def sources = T.sources{
-      pprint.log(crossScalaVersion)
-      pprint.log(millSourcePath)
-      val foo = Vector() ++ CrossModuleBase.scalaVersionPaths("", s => millSourcePath)
-      val actual = millSourcePath / os.up  / "src"
-      pprint.log(foo)
-      pprint.log("=====================================")
-      pprint.log(actual)
-      pprint.log("=====================================")
-      val sup = super.sources() ++ CrossModuleBase.scalaVersionPaths(
-        crossScalaVersion,
-        s => millSourcePath / 'src / 'main / s"scala-$s"
-      ) ++  CrossModuleBase.scalaVersionPaths(crossScalaVersion, s => millSourcePath / s"src") ++ CrossModuleBase.scalaVersionPaths("", s => actual)
-      sup
+      super.sources() ++ CrossModuleBase.scalaVersionPaths("", s => millSourcePath / os.up  / "src")
     }
 
     def artifactName = T {
