@@ -312,7 +312,6 @@ object weepickle extends Module{
 
 trait BenchModule extends CommonModule {
   def scalaVersion = "2.12.8"
-  def scalaPlayVersion = ("2.12.8", "2.7.4")
   def millSourcePath = build.millSourcePath / "bench"
   def ivyDeps = Agg(
     ivy"io.circe::circe-core::0.12.1",
