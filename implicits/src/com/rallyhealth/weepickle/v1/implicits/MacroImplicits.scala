@@ -6,6 +6,7 @@ import scala.language.experimental.macros
   * Stupid hacks to work around scalac not forwarding macro type params properly
   */
 object MacroImplicits {
+
   def dieIfNothing[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)(name: String) = {
     if (c.weakTypeOf[T] =:= c.weakTypeOf[Nothing]) {
       c.abort(
@@ -14,7 +15,9 @@ object MacroImplicits {
       )
     }
   }
-  @deprecated("Can I remove", "without breaking bin compat?")
+
+
+
   def applyTo[T](c: scala.reflect.macros.blackbox.Context)(implicit e: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
     dieIfNothing[T](c)("To")
@@ -23,28 +26,56 @@ object MacroImplicits {
   def applyToIfNotExists[T, To](c: scala.reflect.macros.blackbox.Context)(implicit e: c.WeakTypeTag[T], t: c.WeakTypeTag[To]): c.Expr[T] = {
     import c.universe._
     dieIfNothing[T](c)("To")
+    println("applyToIfNotExists is doing stuff")
     c.inferImplicitValue(weakTypeOf[To]) match {
-      case EmptyTree => c.Expr[T](q"${c.prefix}.macroTo0[$e, ${c.prefix}.To]")
-      case existingImplicit => c.Expr(existingImplicit)
+      case EmptyTree =>
+        println(s"applyToIfNotExists[$e] is using polymorphic implementation")
+        c.Expr[T](q"${c.prefix}.macroTo0[$e, ${c.prefix}.To]")
+      case existingImplicit =>
+        c.Expr(existingImplicit)
     }
   }
+
+
+
   def applyFrom[T](c: scala.reflect.macros.blackbox.Context)(implicit e: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
     dieIfNothing[T](c)("From")
     c.Expr[T](q"${c.prefix}.macroFrom0[$e, ${c.prefix}.From]")
   }
 
+
+
   def applyFromTo[T](c: scala.reflect.macros.blackbox.Context)(implicit e: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
     dieIfNothing[T](c)("From")
+    println("applyFromTo")
     c.Expr[T](q"${c.prefix}.FromTo.join(${c.prefix}.macroTo, ${c.prefix}.macroFrom)")
   }
+  def applyFromToIfNotExists[X, FromTo](c: scala.reflect.macros.blackbox.Context)(implicit e: c.WeakTypeTag[X], ft: c.WeakTypeTag[FromTo]): c.Expr[X] = {
+    import c.universe._
+    dieIfNothing[X](c)("From")
 
+
+    println("applyFromToIfNotExists")
+    c.inferImplicitValue(weakTypeOf[FromTo]) match {
+      case EmptyTree =>
+        // :(
+        println(s"applyFromToIfNotExists() didn't find implicits for ${e}")
+        c.Expr[X](q"${c.prefix}.FromTo.join(${c.prefix}.macroTo, ${c.prefix}.macroFrom)")
+      case existingImplicit =>
+        // :)
+        println(s"applyFromToIfNotExists[${e}] found existing implicit! $existingImplicit")
+        c.Expr(existingImplicit)
+    }
+  }
 }
-trait MacroImplicits { this: com.rallyhealth.weepickle.v1.core.Types =>
+
+trait MacroImplicits {
+  this: com.rallyhealth.weepickle.v1.core.Types =>
   implicit def macroSingletonTo[T <: Singleton]: To[T] = macro MacroImplicits.applyToIfNotExists[T, To[T]]
   implicit def macroSingletonFrom[F <: Singleton]: From[F] = macro MacroImplicits.applyFrom[F]
-  implicit def macroSingletonFromTo[X <: Singleton]: FromTo[X] = macro MacroImplicits.applyFromTo[X]
+  implicit def macroSingletonFromTo[X <: Singleton]: FromTo[X] = macro MacroImplicits.applyFromToIfNotExists[X, FromTo[X]]
   def macroFrom[F]: From[F] = macro MacroImplicits.applyFrom[F]
   def macroTo[T]: To[T] = macro MacroImplicits.applyTo[T]
   def macroFromTo[X]: FromTo[X] = macro MacroImplicits.applyFromTo[FromTo[X]]

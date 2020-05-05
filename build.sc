@@ -302,6 +302,11 @@ object weepickle extends Module{
     def moduleDeps = Seq(weejson.jvm(), implicits.jvm(), weejson.jackson())
 
     object test extends Tests with CommonModule{
+
+      override def scalacOptions = T{
+        super.scalacOptions() :+ "-Ymacro-debug-lite"
+      }
+
       def moduleDeps = {
         super.moduleDeps ++ Seq(
           weejson.yaml(),
