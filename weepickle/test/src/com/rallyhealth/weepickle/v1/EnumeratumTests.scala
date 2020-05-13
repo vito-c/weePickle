@@ -52,14 +52,17 @@ object EnumeratumTests extends TestSuite {
   val tests = Tests {
 
     test("to") {
-//      test("Fruit") {
-//        implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
-//      }
+      // test("Fruit") {
+      //   implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
+      // }
       test("Peach") {
         // Explicitly call macro
-        implicit val peachFromTo = WeePickle.macroSingletonFromTo[Fruit.Peach.type]
-        println(peachFromTo)
-        implicitly[To[Fruit.Peach.type]].visitString("peach") ==> Fruit.Peach
+        // implicit val peachFromTo = WeePickle.macroSingletonFromTo[Fruit.Peach.type]
+        // println(peachFromTo)
+        // implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
+        macrolizer.show {
+          implicitly[To[Fruit.Peach.type]].visitString("peach") ==> Fruit.Peach
+        }
       }
     }
   }

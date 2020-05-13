@@ -9,14 +9,14 @@ import com.typesafe.tools.mima.lib.MiMaLib
 import com.typesafe.tools.mima.core._
 import coursier.maven.MavenRepository
 import mill.scalalib.scalafmt.ScalafmtModule
+import $ivy.`com.lihaoyi::mill-contrib-bloop:0.6.2`
 
-val scalaVersions = Seq("2.11.12", "2.12.8", "2.13.0")
+val scalaVersions = Seq("2.11.12", "2.12.11", "2.13.0")
 val scalaPlayVersions = Seq(
   ("2.11.12", "2.5.19"),
   ("2.11.12", "2.7.4"),
-  ("2.12.8", "2.7.4"),
-  ("2.13.0", "2.7.4"),
-  ("2.13.0", "2.8.1"),
+  ("2.12.11", "2.7.4"),
+  ("2.13.0", "2.7.4")
 )
 
 trait CommonModule extends ScalaModule with ScalafmtModule {
@@ -109,6 +109,8 @@ object implicits extends Module {
   trait ImplicitsModule extends CommonPublishModule{
     def compileIvyDeps = T{
       Agg(
+        ivy"com.lihaoyi::pprint:0.5.6",
+        ivy"io.bullet::macrolizer:0.5.0;classifier=compile-internal",
         ivy"com.lihaoyi::acyclic:${if (isScalaOld()) "0.1.8" else "0.2.0"}",
         ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
       )
@@ -283,11 +285,14 @@ object weejson extends Module{
 
 trait weepickleModule extends CommonPublishModule{
   def artifactName = shade("weepickle")
+
   def compileIvyDeps = Agg(
+    ivy"io.bullet::macrolizer:0.5.0;classifier=compile-internal",
     ivy"com.lihaoyi::acyclic:${if (isScalaOld()) "0.1.8" else "0.2.0"}",
     ivy"org.scala-lang:scala-reflect:${scalaVersion()}",
     ivy"org.scala-lang:scala-compiler:${scalaVersion()}"
   )
+
   def scalacOptions = Seq(
     "-unchecked",
     "-deprecation",
@@ -307,6 +312,12 @@ object weepickle extends Module{
         super.scalacOptions() :+ "-Ymacro-debug-lite"
       }
 
+      def ivyDeps = super.ivyDeps() ++ Agg(
+        ivy"com.lihaoyi::pprint:0.5.6",
+        ivy"io.bullet::macrolizer:0.5.0",
+        ivy"io.bullet::macrolizer:0.5.0;classifier=compile-internal"
+      )
+
       def moduleDeps = {
         super.moduleDeps ++ Seq(
           weejson.yaml(),
@@ -323,7 +334,7 @@ object weepickle extends Module{
 }
 
 trait BenchModule extends CommonModule {
-  def scalaVersion = "2.12.8"
+  def scalaVersion = "2.12.11"
   def millSourcePath = build.millSourcePath / "bench"
   def ivyDeps = Agg(
     ivy"io.circe::circe-core::0.12.1",
@@ -340,7 +351,7 @@ object bench extends Module {
 
   object jvm extends BenchModule with Jmh{
     def platformSegment = "jvm"
-    def moduleDeps = Seq(weepickle.jvm("2.12.8").test)
+    def moduleDeps = Seq(weepickle.jvm("2.12.11").test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.fasterxml.jackson.module::jackson-module-scala:2.9.10",
       ivy"com.fasterxml.jackson.core:jackson-databind:2.9.4",
