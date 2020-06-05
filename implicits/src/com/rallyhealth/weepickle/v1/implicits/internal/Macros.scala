@@ -259,8 +259,26 @@ object Macros {
           case Some(customName) => Literal(Constant(customName))
           case None             => q"${c.prefix}.tagName"
         }
-        val tag = customKey(tpe.typeSymbol).getOrElse(tpe.typeSymbol.fullName)
-        q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
+        val skTag = customKey(tpe.typeSymbol)
+        val bkTag = customBoolKey(tpe.typeSymbol)
+        (bkTag, skTag) match {
+          case (Some(b), None) =>
+            val tag = tpe.typeSymbol.fullName
+            q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
+          case (None, Some(s)) =>
+            val tag = tpe.typeSymbol.fullName
+            q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
+          case _ =>
+            val tag = tpe.typeSymbol.fullName
+            q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
+        }
+        // for {
+        //   tag1 <- customKey(tpe.typeSymbol)
+        //   tag2 <- customBoolKey(tpe.typeSymbol)
+        // } yield {
+        //   tag1
+        // }
+        // q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
       }
     }
 

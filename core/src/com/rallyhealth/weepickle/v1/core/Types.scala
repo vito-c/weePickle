@@ -254,6 +254,7 @@ trait Types { types =>
   def taggedArrayContext[T](taggedTo: TaggedTo[T]): ArrVisitor[Any, T] = throw new Abort(taggedExpectedMsg)
   def taggedObjectContext[T](taggedTo: TaggedTo[T]): ObjVisitor[Any, T] = throw new Abort(taggedExpectedMsg)
   def taggedWrite[T, R](w: CaseW[T], tagName: String, tag: String, out: Visitor[_, R], v: T): R
+  def taggedBoolWrite[T, R](w: CaseW[T], tagName: String, tag: Boolean, out: Visitor[_, R], v: T): R
 
   private[this] def scanChildren[T, V](xs: Seq[T])(f: T => V) = {
     var x: V = null.asInstanceOf[V]
@@ -283,6 +284,9 @@ trait Types { types =>
     override def visitObject(length: Int) = taggedObjectContext(this)
   }
   object TaggedTo {
+    class BoolLeaf[T](override val tagName: String, tag: Boolean, r: To[T]) extends TaggedTo[T] {
+      def findTo(s: String) = if (s == tag) r else null
+    }
     class Leaf[T](override val tagName: String, tag: String, r: To[T]) extends TaggedTo[T] {
       def findTo(s: String) = if (s == tag) r else null
     }
@@ -300,7 +304,21 @@ trait Types { types =>
 
     }
   }
+  trait TaggedFromBool[In] extends From[In] with Tagged {
+    def findFrom(v: Any): (Boolean, CaseW[In])
+    override def transform0[Out](in: In, out: Visitor[_, Out]): Out = {
+      val (tag, w) = findFrom(in)
+      taggedBoolWrite(w, tagName, tag, out, in)
+
+    }
+  }
   object TaggedFrom {
+    class BoolLeaf[T](c: ClassTag[_], override val tagName: String, tag: Boolean, r: CaseW[T]) extends TaggedFromBool[T] {
+      def findFrom(v: Any) = {
+        if (c.runtimeClass.isInstance(v)) tag -> r
+        else null
+      }
+    }
     class Leaf[T](c: ClassTag[_], override val tagName: String, tag: String, r: CaseW[T]) extends TaggedFrom[T] {
       def findFrom(v: Any) = {
         if (c.runtimeClass.isInstance(v)) tag -> r
