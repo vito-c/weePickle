@@ -68,22 +68,44 @@ object MacroImplicits {
     }
     val mactree = c.macroApplication
     val mactpe = mactree.tpe
-    val tref: Option[TypeRef] = mactpe match {
-      case tr:TypeRef => Some(tr)
-      case _ => None
-    }
+    // com.rallyhealth.weepickle.v1.WeePickle.macroSingletonFromTo[com.rallyhealth.weepickle.v1.Fruit.Peach.type]
+    println(mactree)
+    println(showRaw(mactree))
+
+    println(c.prefix.tree)
+    println(showRaw(c.prefix.tree))
+    
+    // println(c.enclosingMacros.size)
+    // c.openMacros.map { m => 
+    //   println("++++++++++++++")
+    //   println(m.enclosingImplicits.size)
+    //   m.enclosingImplicits.map { i => 
+    //     println(i.pre) 
+    //     println(i.sym) 
+    //     println(i.pt) 
+    //     println(i.tree) 
+    //   }
+    //   println("++++++++++++++")
+    // }
+
     c.enclosingImplicits.collect { 
       case i @  c.ImplicitCandidate(_, _, TypeRef(itpe, isym, ilst), itree) =>
+        println(scala.reflect.runtime.universe.showRaw(itree))
         println("HAPPY PATH")
         mactpe match {
           case TypeRef(mtpe, msym, mlst) =>
             if(mtpe == itpe && mlst == ilst) {
+              println("--------------")
               println("MATCH")
-              c.Expr[X](i)
-              // c.abort(
-              //   c.enclosingPosition,
-              //   s"implicit collision"
-              // )
+              println(mtpe)
+              println(showRaw(mtpe))
+              println(mactree)
+              println(showRaw(mactree.symbol))
+              println("--------------")
+              c.abort(
+                c.enclosingPosition,
+                s"implicit collision"
+              )
             } else {
               println("NO MATCH")
               None
