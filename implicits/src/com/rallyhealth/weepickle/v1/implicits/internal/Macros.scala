@@ -1,6 +1,6 @@
 package com.rallyhealth.weepickle.v1.implicits.internal
 
-import com.rallyhealth.weepickle.v1.implicits.{discriminator, dropDefault, key}
+import com.rallyhealth.weepickle.v1.implicits.{discriminator, dropDefault, key, keyBoolean}
 
 import scala.language.experimental.macros
 import scala.language.{existentials, higherKinds}
@@ -269,6 +269,16 @@ object Macros {
         .find(_.tree.tpe == typeOf[key])
         .flatMap(_.tree.children.tail.headOption)
         .map { case Literal(Constant(s)) => s.toString }
+    }
+
+    def customBoolKey(sym: c.Symbol): Option[Boolean] = {
+      sym.annotations
+        .find(_.tree.tpe == typeOf[keyBoolean])
+        .flatMap(_.tree.children.tail.headOption)
+        .map { case Literal(Constant(s)) => 
+          val str = s.toString
+          str.toBoolean
+        }
     }
 
     def customDiscriminator(sym: c.Symbol): Option[String] = {

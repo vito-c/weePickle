@@ -89,10 +89,19 @@ object KeyedTagBool {
   @discriminator("active")
   sealed trait A 
   object A {
-    implicit val rw: RW[A] = RW.merge(B.rw, macroFromTo[C.type])
+    // implicit val rw: RW[A] = RW.merge(ActiveA.rw, macroFromTo[InactiveA.type])
+    implicit val rw: RW[A] = macroFromTo[A]
   }
+  @com.rallyhealth.weepickle.v1.implicits.keyBoolean("true")
   case class ActiveA() extends A
+  object ActiveA  {
+    implicit val rw: RW[ActiveA] = macroFromTo[ActiveA]
+  }
+  @com.rallyhealth.weepickle.v1.implicits.keyBoolean("false")
   case class InactiveA() extends A
+  object InactiveA  {
+    implicit val rw: RW[InactiveA] = macroFromTo[InactiveA]
+  }
 }
 
 object Custom2 {
@@ -116,6 +125,7 @@ import Sealed._
 import Simple._
 import Recursive._
 import Defaults._
+import KeyedTagBool._
 
 object ExampleTests extends TestSuite {
 
@@ -334,10 +344,10 @@ object ExampleTests extends TestSuite {
         FromJson("""{"hehehe": 10}""").transform(ToScala[KeyBar]) ==> KeyBar(10)
       }
       test("booltag")  {
-        FromScala(InactiveA()).transform(ToJson.string) ==> """{"active":false}"""
-        FromScala(ActiveA()).transform(ToJson.string) ==> """{"active":true}"""
         FromJson("""{"active":false}""").transform(ToScala[InactiveA]) ==> InactiveA()
         FromJson("""{"active":true}""").transform(ToScala[ActiveA]) ==> ActiveA()
+        FromScala(InactiveA()).transform(ToJson.string) ==> """{"active":false}"""
+        FromScala(ActiveA()).transform(ToJson.string) ==> """{"active":true}"""
       }
       test("tag") {
         FromScala(B(10)).transform(ToJson.string) ==> """{"customDiscriminator":"Bee","i":10}"""

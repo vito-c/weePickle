@@ -10,3 +10,5 @@ import scala.annotation.StaticAnnotation
   * @see http://www.lihaoyi.com/upickle/#CustomKeys
   */
 case class key(s: String) extends StaticAnnotation
+// case class typedKey(s: String, tpe: String) extends StaticAnnotation
+case class keyBoolean(s: String) extends StaticAnnotation
