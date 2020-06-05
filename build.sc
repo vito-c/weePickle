@@ -308,9 +308,9 @@ object weepickle extends Module{
 
     object test extends Tests with CommonModule{
 
-      override def scalacOptions = T{
-        super.scalacOptions() :+ "-Ymacro-debug-lite"
-      }
+      // override def scalacOptions = T{
+      //   super.scalacOptions() :+ "-Ymacro-debug-lite"
+      // }
 
       def ivyDeps = super.ivyDeps() ++ Agg(
         ivy"com.lihaoyi::pprint:0.5.6",
