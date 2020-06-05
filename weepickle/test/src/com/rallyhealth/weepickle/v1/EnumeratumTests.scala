@@ -52,37 +52,37 @@ object Fruit {
 
   // override val values = Seq(Peach, Pear, Strawberry)
 }
-object PickledFruit extends WeePickleEnum[Fruit] {
-}
-
-object EnumeratumTests extends TestSuite {
-
-
-  val tests = Tests {
-
-    test("to") {
-      test("Fruit") {
-        import PickledFruit.peachPickler
-        implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
-      }
-      test("Peach type") {
-        import PickledFruit.peachPickler
-        val peachy = FromJson("""""peach"""").transform(ToScala[Fruit.Peach.type])
-        peachy ==> Fruit.Peach
-        val pick = FromScala(Fruit.Peach).transform(ToJson.string)
-        pick ==> """"peach""""
-        // implicitly[To[Fruit.Peach.type]].visitString("peach") ==> Fruit.Peach
-      }
-      test("Peach") {
-        import PickledFruit.peachPickler
-        // Explicitly call macro
-        // implicit val peachFromTo = WeePickle.macroSingletonFromTo[Fruit.Peach.type]
-        // println(peachFromTo)
-        // implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
-        macrolizer.show {
-          implicitly[To[Fruit.Peach.type]].visitString("peach") ==> Fruit.Peach
-        }
-      }
-    }
-  }
-}
+// object PickledFruit extends WeePickleEnum[Fruit] {
+// }
+//
+// object EnumeratumTests extends TestSuite {
+//
+//
+//   val tests = Tests {
+//
+//     test("to") {
+//       test("Fruit") {
+//         import PickledFruit.peachPickler
+//         implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
+//       }
+//       test("Peach type") {
+//         import PickledFruit.peachPickler
+//         val peachy = FromJson("""""peach"""").transform(ToScala[Fruit.Peach.type])
+//         peachy ==> Fruit.Peach
+//         val pick = FromScala(Fruit.Peach).transform(ToJson.string)
+//         pick ==> """"peach""""
+//         // implicitly[To[Fruit.Peach.type]].visitString("peach") ==> Fruit.Peach
+//       }
+//       test("Peach") {
+//         import PickledFruit.peachPickler
+//         // Explicitly call macro
+//         // implicit val peachFromTo = WeePickle.macroSingletonFromTo[Fruit.Peach.type]
+//         // println(peachFromTo)
+//         // implicitly[To[Fruit]].visitString("peach") ==> Fruit.Peach
+//         macrolizer.show {
+//           implicitly[To[Fruit.Peach.type]].visitString("peach") ==> Fruit.Peach
+//         }
+//       }
+//     }
+//   }
+// }
