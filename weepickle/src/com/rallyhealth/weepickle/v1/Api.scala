@@ -86,15 +86,18 @@ trait AttributeTagged extends Api {
     */
   def tagName: String = "$type"
 
-  def annotate[V](rw: CaseR[V], tagName: String, tag: Boolean) = {
+  def annotateBool[V](rw: CaseR[V], tagName: String, tag: Boolean) = {
+    println("annotate boolean")
     new TaggedTo.BoolLeaf[V](tagName, tag, rw)
   }
 
   def annotate[V](rw: CaseR[V], tagName: String, tag: String) = {
+    println("annotate string")
     new TaggedTo.Leaf[V](tagName, tag, rw)
   }
 
   def annotate[V](rw: CaseW[V], tagName: String, tag: String)(implicit c: ClassTag[V]) = {
+    println("annotate implicit")
     new TaggedFrom.Leaf[V](c, tagName, tag, rw)
   }
 
@@ -178,6 +181,7 @@ trait AttributeTagged extends Api {
     val keyVisitor = ctx.visitKey()
 
     ctx.visitKeyValue(keyVisitor.visitString(tagName))
+    println(s"visit value: $tag")
     ctx.visitValue(ctx.subVisitor.visitString(objectTypeKeyWriteMap(tag)))
     w.writeToObject(ctx, v)
     val res = ctx.visitEnd()

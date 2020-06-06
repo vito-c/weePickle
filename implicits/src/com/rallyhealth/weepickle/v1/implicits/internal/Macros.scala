@@ -263,10 +263,10 @@ object Macros {
         val bkTag = customBoolKey(tpe.typeSymbol)
         (bkTag, skTag) match {
           case (Some(b), None) =>
-            val tag = tpe.typeSymbol.fullName
-            q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
+            val tag = b
+            q"""${c.prefix}.annotateBool($derived, $tagName, $tag)"""
           case (None, Some(s)) =>
-            val tag = tpe.typeSymbol.fullName
+            val tag = s
             q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
           case _ =>
             val tag = tpe.typeSymbol.fullName
