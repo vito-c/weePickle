@@ -172,6 +172,7 @@ trait AttributeTagged extends Api {
 
     }
   }
+
   def taggedWrite[T, R](w: CaseW[T], tagName: String, tag: String, out: Visitor[_, R], v: T): R = {
     val ctx = out.asInstanceOf[Visitor[Any, R]].visitObject(w.length(v) + 1)
     val keyVisitor = ctx.visitKey()
@@ -181,5 +182,17 @@ trait AttributeTagged extends Api {
     w.writeToObject(ctx, v)
     val res = ctx.visitEnd()
     res
+  }
+
+  def taggedBoolWrite[T, R](w: CaseW[T], tagName: String, tag: Boolean, out: Visitor[_, R], v: T): R = {
+    ???
+    // val ctx = out.asInstanceOf[Visitor[Any, R]].visitObject(w.length(v) + 1)
+    // val keyVisitor = ctx.visitKey()
+    //
+    // ctx.visitKeyValue(keyVisitor.visitString(tagName))
+    // ctx.visitValue(ctx.subVisitor.visitString(objectTypeKeyWriteMap(tag)))
+    // w.writeToObject(ctx, v)
+    // val res = ctx.visitEnd()
+    // res
   }
 }

@@ -301,7 +301,6 @@ trait Types { types =>
     override def transform0[Out](in: In, out: Visitor[_, Out]): Out = {
       val (tag, w) = findFrom(in)
       taggedWrite(w, tagName, tag, out, in)
-
     }
   }
   trait TaggedFromBool[In] extends From[In] with Tagged {

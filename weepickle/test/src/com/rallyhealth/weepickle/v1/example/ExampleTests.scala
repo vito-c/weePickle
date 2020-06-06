@@ -346,8 +346,8 @@ object ExampleTests extends TestSuite {
       test("booltag")  {
         FromJson("""{"active":false}""").transform(ToScala[InactiveA]) ==> InactiveA()
         FromJson("""{"active":true}""").transform(ToScala[ActiveA]) ==> ActiveA()
-        FromScala(InactiveA()).transform(ToJson.string) ==> """{"active":false}"""
-        FromScala(ActiveA()).transform(ToJson.string) ==> """{"active":true}"""
+        // FromScala(InactiveA()).transform(ToJson.string) ==> """{"active":false}"""
+        // FromScala(ActiveA()).transform(ToJson.string) ==> """{"active":true}"""
       }
       test("tag") {
         FromScala(B(10)).transform(ToJson.string) ==> """{"customDiscriminator":"Bee","i":10}"""

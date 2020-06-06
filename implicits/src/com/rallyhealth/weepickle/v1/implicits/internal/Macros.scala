@@ -272,13 +272,6 @@ object Macros {
             val tag = tpe.typeSymbol.fullName
             q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
         }
-        // for {
-        //   tag1 <- customKey(tpe.typeSymbol)
-        //   tag2 <- customBoolKey(tpe.typeSymbol)
-        // } yield {
-        //   tag1
-        // }
-        // q"""${c.prefix}.annotate($derived, $tagName, $tag)"""
       }
     }
 
